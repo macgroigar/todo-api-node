@@ -4,7 +4,7 @@ service: todo-api-node
 frameworkVersion: '3'
 
 custom:
-  tableName: 'users-table-${sls:stage}'
+  tableName: 'todos-table-${sls:stage}'
 
 provider:
   name: aws
@@ -34,16 +34,50 @@ functions:
           method: post
           cors: true
 
+  list:
+    handler: handler/listTodos.listTodos
+    events:
+      - http:
+          path: todos/list
+          method: get
+          cors: true
+
+  get:
+    handler: handler/getTodo.getTodo
+    events:
+      - http:
+          path: todos/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: handler/updateTodo.updateTodo
+    events:
+      - http:
+          path: todos/update/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: handler/deleteTodo.deleteTodo
+    events:
+      - http:
+          path: todos/delete/{id}
+          method: delete
+          cors: true
+          
+
 resources:
   Resources:
     UsersTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: userId
+          - AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: userId
+          - AttributeName: id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:custom.tableName}
+
